@@ -1,3 +1,9 @@
+import keract
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap, BoundaryNorm
+
 def display_conv_activations(classifier,sig):
     #get activations
     sig = sig.reshape(1,sig.shape[0],sig.shape[1])
