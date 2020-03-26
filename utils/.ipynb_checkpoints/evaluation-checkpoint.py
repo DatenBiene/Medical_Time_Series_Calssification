@@ -6,10 +6,10 @@ import pandas as pd
 def evaluate(ytrue,ypred):
 
     metrics = pd.DataFrame([],columns=['accuracy','recall','precision','f1-score'])
-    metrics['accuracy'] = [accuracy_score(ytrue,ypred)]
-    metrics['recall'] = [recall_score(ytrue,ypred,average='macro')]
-    metrics['precision'] = [precision_score(ytrue,ypred,average='macro',zero_division=0)]
-    metrics['f1-score'] = [f1_score(ytrue,ypred,average='macro',zero_division=0)]
+    metrics['accuracy'] = accuracy_score(ytrue,ypred)
+    metrics['recall'] = recall_score(ytrue,ypred,average='macro')
+    metrics['precision'] = precision_score(ytrue,ypred,average='macro')
+    metrics['f1-score'] = f1_score(ytrue,ypred,average='macro')
 
     return metrics
 
@@ -22,6 +22,6 @@ def get_binary_metrics(ytrue,ypred):
         ytrue_l = (ytrue==l).astype(int)
         ypred_l = (ypred == l).astype(int)
         results.loc[l] = [recall_score(ytrue_l,ypred_l),
-                          precision_score(ytrue_l,ypred_l,zero_division=0),
-                          f1_score(ytrue_l,ypred_l,zero_division=0)  ]
+                          precision_score(ytrue_l,ypred_l),
+                          f1_score(ytrue_l,ypred_l)  ]
     return results

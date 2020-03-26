@@ -1,14 +1,14 @@
-# MLP model 
+# MLP model
 import tensorflow.keras as keras
 import tensorflow as tf
 import numpy as np
 import time
 
-import matplotlib 
+import matplotlib
 matplotlib.use('agg')
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
-from utils.utils import save_logs
+from utils.utils import save_logs,plot_epochs_metric
 from utils.utils import calculate_metrics
 
 class Classifier_MLP:
@@ -26,9 +26,9 @@ class Classifier_MLP:
 	def build_model(self, input_shape, nb_classes):
 		input_layer = keras.layers.Input(input_shape)
 
-		# flatten/reshape because when multivariate all should be on the same axis 
+		# flatten/reshape because when multivariate all should be on the same axis
 		input_layer_flattened = keras.layers.Flatten()(input_layer)
-		
+
 		layer_1 = keras.layers.Dropout(0.1)(input_layer_flattened)
 		layer_1 = keras.layers.Dense(500, activation='relu')(layer_1)
 
@@ -48,9 +48,9 @@ class Classifier_MLP:
 
 		reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=200, min_lr=0.1)
 
-		file_path = self.output_directory+'best_model.hdf5' 
+		file_path = self.output_directory+'best_model.hdf5'
 
-		model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss', 
+		model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
 			save_best_only=True)
 
 		self.callbacks = [reduce_lr,model_checkpoint]
@@ -63,29 +63,31 @@ class Classifier_MLP:
 			exit()
 		if len(y_true.shape)>1:
 			y_true = np.argmax(y_true,axis=1)
-		# x_val and y_val are only used to monitor the test loss and NOT for training  
+		# x_val and y_val are only used to monitor the test loss and NOT for training
 
 		mini_batch_size = int(min(x_train.shape[0]/10, batch_size))
 
-		start_time = time.time() 
+		start_time = time.time()
 
 		hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
 			verbose=self.verbose, validation_data=(x_val,y_val), callbacks=self.callbacks)
-		
+
 		duration = time.time() - start_time
 
 		self.model.save(self.output_directory + 'last_model.hdf5')
 
-		model = keras.models.load_model(self.output_directory+'best_model.hdf5')
+		#model = keras.models.load_model(self.output_directory+'best_model.hdf5')
 
-		y_pred = model.predict(x_val)
+		#y_pred = model.predict(x_val)
 
-		# convert the predicted from binary to integer 
-		y_pred = np.argmax(y_pred , axis=1)
+		# convert the predicted from binary to integer
+		#y_pred = np.argmax(y_pred , axis=1)
 
-		save_logs(self.output_directory, hist, y_pred, y_true, duration)
+		#save_logs(self.output_directory, hist, y_pred, y_true, duration)
+		plot_epochs_metric(hist,'loss')
 
 		keras.backend.clear_session()
+		return hist
 
 	def predict(self, x_test, y_true,return_df_metrics = True):
 		if len(y_true.shape)>1:
