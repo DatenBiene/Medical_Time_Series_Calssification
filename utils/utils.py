@@ -74,8 +74,8 @@ def read_dataset(path,NAME):
         data,labels = np.array(data),np.array(labels,dtype=int)
 
     elif NAME == 'transplant':
-        data = np.load(path)
-        labels = [] #à compléter, voir avec Pierre
+        x_train, y_train, x_test, y_test, labels = np.load(path)
+        return x_train,y_train,x_test,y_test,labels
     else:
         raise ValueError(f'Name {NAME} not recognized')
 
