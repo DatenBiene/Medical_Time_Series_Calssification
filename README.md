@@ -1,4 +1,4 @@
-# Medical_Time_Series_Calssification
+# Medical_Time_Series_Classification
 
 Time Series Classification with Deep Learning for Medicine
 
