@@ -7,7 +7,6 @@ import numpy as np
 import time
 
 import matplotlib
-from utils.utils import save_test_duration
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
