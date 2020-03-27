@@ -129,6 +129,33 @@ def split_dataset(data,labels,validation=True , val_prop = 0.2):
         return xtrain,ytrain,xtest,ytest,y_test_true
 
 
+def visualize_transplant(X,y):
+    fig = plt.figure(figsize=(14,15))
+    series0 = X[y==0][0]
+    series1 = X[y==1][0]
+    N = series0.shape[1]
+    for i in range(N):
+        ax0 = fig.add_subplot(N,2,2*i+1)
+        ax1 = fig.add_subplot(N,2,2*i+2)
+
+        ax0.plot(series0[:,i])
+        ax1.plot(series1[:,i])
+
+        ax0.set_ylabel(cols[i],fontsize=16)
+        if i == 0:
+            ax0.set_title('Example of label 0',fonsize=16)
+            ax1.set_title('Example of label 1',fonsize=16)
+    plt.tight_layout()
+    plt.show()
+
+def visualize_mitbih(X,y):
+    fig = plt.figure(figsize=(14,5))
+    for c in set(y):
+        spe_ecg = X[y==c][0]
+        plt.plot(spe_ecg,label='example of label '+str(c))
+
+    plt.legend()
+    plt.show()
 
 def calculate_metrics(y_true, y_pred, duration, y_true_val=None, y_pred_val=None):
     res = pd.DataFrame(data=np.zeros((1, 4), dtype=np.float), index=[0],
