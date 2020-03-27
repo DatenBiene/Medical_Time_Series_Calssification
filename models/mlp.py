@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-from utils.utils import save_logs,plot_epochs_metric
+from utils.utils import plot_epochs_metric
 from utils.utils import calculate_metrics
 
 class Classifier_MLP:

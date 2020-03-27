@@ -12,7 +12,7 @@ from utils.utils import save_test_duration
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-from utils.utils import save_logs,plot_epochs_metric
+from utils.utils import plot_epochs_metric
 from utils.utils import calculate_metrics
 
 
@@ -147,8 +147,6 @@ class Classifier_RESNET:
 
         # convert the predicted from binary to integer
         #y_pred = np.argmax(y_pred, axis=1)
-
-        #df_metrics = save_logs(self.output_directory, hist, y_pred, y_true, duration)
 
         keras.backend.clear_session()
 
