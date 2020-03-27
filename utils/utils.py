@@ -100,21 +100,21 @@ def split_dataset(data,labels,validation=True):
     """
     labels = np.array(labels,dtype=int)
     data = np.array(data)
-    
+
     if validation:
         val_proportion = 0.4
     else:
         val_proportion = 0.2
     sss = StratifiedShuffleSplit(n_splits=1, test_size=val_proportion, random_state=0)
     #split train test
-    for train_index,val_index  in sss.split(data,labels):
-        xtrain,xtest = data[train_index],data[val_index]
-        ytrain,ytest = labels[train_index],labels[val_index]
+    for train_index,test_index  in sss.split(data,labels):
+        xtrain,xtest = data[train_index],data[test_index]
+        ytrain,ytest = labels[train_index],labels[test_index]
 
     if validation:
         #split validation test
         sss = StratifiedShuffleSplit(n_splits=1, test_size=0.5, random_state=0)
-        for val_index,test_index in sss.split(xval,yval):
+        for val_index,test_index in sss.split(xtest,ytest):
             xval,xtest = xtest[val_index],xtest[test_index]
             yval,ytest = ytest[val_index],ytest[test_index]
 
