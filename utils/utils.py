@@ -82,35 +82,59 @@ def read_dataset(path,NAME):
     return data,labels
 
 
-def split_dataset(data,labels,NAME):
-    if NAME == 'MIT-BIH':
+def split_dataset(data,labels,validation=True):
+    """
+    splits dataset into (train,test) or (train,validation,test)
+    arguments
+    ---------
+    data: features (X), array-like
+    labels : classes (y), array-like
+    validation: bool, if True split in (train,validation,test) with proportion (0.6,0.2,0.2)
+                      if False split in (train,test) with proportion (0.8,0.2)
+
+    returns
+    -------
+    xtrain,xtest,(xval): splitted versions of data
+    ytrain,ytest,(yval): splitted versions of labels as one hot encoding if more than 2 classes
+    y_test_true,(y_val_true): not one hot encoded versions of labels
+    """
+    labels = np.array(labels,dtype=int)
+    data = np.array(data)
+    
+    if validation:
         val_proportion = 0.4
     else:
         val_proportion = 0.2
     sss = StratifiedShuffleSplit(n_splits=1, test_size=val_proportion, random_state=0)
-    #split train validation
+    #split train test
     for train_index,val_index  in sss.split(data,labels):
-        xtrain,xval = data[train_index],data[val_index]
-        ytrain,yval = labels[train_index],labels[val_index]
+        xtrain,xtest = data[train_index],data[val_index]
+        ytrain,ytest = labels[train_index],labels[val_index]
 
-    if NAME=='MIT-BIH' or NAME=='transplant':
+    if validation:
         #split validation test
         sss = StratifiedShuffleSplit(n_splits=1, test_size=0.5, random_state=0)
         for val_index,test_index in sss.split(xval,yval):
-            xval,xtest = xval[val_index],xval[test_index]
-            yval,ytest = yval[val_index],yval[test_index]
+            xval,xtest = xtest[val_index],xtest[test_index]
+            yval,ytest = ytest[val_index],ytest[test_index]
 
     if len(np.unique(labels))>2:
         ytrain = to_categorical(ytrain)
-        y_true = yval #not categorical
-        yval = to_categorical(yval)
-    else:
-        y_true = yval
+        y_test_true = ytest #not categorical
+        ytest = to_categorical(ytest)
 
-    if NAME == 'MIT-BIH' or NAME=='transplant':
-        return xtrain,ytrain,xval,yval,xtest,ytest,y_true
+        if validation:
+            y_val_true = yval #not categorical
+            yval = to_categorical(yval)
     else:
-        return xtrain,ytrain,xval,yval,y_true
+        if validation:
+            y_val_true = yval
+        y_test_true = ytest
+
+    if validation:
+        return xtrain,ytrain,xval,yval,y_val_true,xtest,ytest,y_test_true
+    else:
+        return xtrain,ytrain,xtest,ytest,y_test_true
 
 
 
