@@ -13,40 +13,37 @@ from utils.utils import calculate_metrics
 
 class Classifier_MLP:
 
-	def __init__(self, output_directory, input_shape, nb_classes, verbose=False,build=True):
+	def __init__(self, output_directory, input_shape, nb_classes, hidden_layers_size,verbose=False,build=True):
 		self.output_directory = output_directory
 		if build == True:
-			self.model = self.build_model(input_shape, nb_classes)
+			self.model = self.build_model(input_shape, nb_classes,hidden_layers_size)
 			if(verbose==True):
 				self.model.summary()
 			self.verbose = verbose
 			self.model.save_weights(self.output_directory + 'model_init.hdf5')
 		return
 
-	def build_model(self, input_shape, nb_classes):
-		input_layer = keras.layers.Input(input_shape)
+	def build_model(self, input_shape, nb_classes,hidden_layers_size):
+
+		n_layers = len(hidden_layers_size)
+
+		model = keras.models.Sequential()
+		model.add(keras.layers.Input(input_shape))
 
 		# flatten/reshape because when multivariate all should be on the same axis
-		input_layer_flattened = keras.layers.Flatten()(input_layer)
+		model.add(keras.layers.Flatten())
 
-		layer_1 = keras.layers.Dropout(0.1)(input_layer_flattened)
-		layer_1 = keras.layers.Dense(500, activation='relu')(layer_1)
+		for i in range(n_layers):
+			model.add(keras.layers.Dropout(0.1))
+			model.add(keras.layers.Dense(hidden_layers_size[i], activation='relu'))
 
-		layer_2 = keras.layers.Dropout(0.2)(layer_1)
-		layer_2 = keras.layers.Dense(500, activation='relu')(layer_2)
-
-		layer_3 = keras.layers.Dropout(0.2)(layer_2)
-		layer_3 = keras.layers.Dense(500, activation='relu')(layer_3)
-
-		output_layer = keras.layers.Dropout(0.3)(layer_3)
-		output_layer = keras.layers.Dense(nb_classes, activation='softmax')(output_layer)
-
-		model = keras.models.Model(inputs=input_layer, outputs=output_layer)
+		model.add(keras.layers.Dropout(0.3))
+		model.add(keras.layers.Dense(nb_classes, activation='softmax'))
 
 		model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adadelta(),
 			metrics=['accuracy'])
 
-		reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=200, min_lr=0.1)
+		reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.01)
 
 		file_path = self.output_directory+'best_model.hdf5'
 
