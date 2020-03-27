@@ -82,7 +82,7 @@ def read_dataset(path,NAME):
     return data,labels
 
 
-def split_dataset(data,labels,validation=True):
+def split_dataset(data,labels,validation=True , val_prop = 0.2):
     """
     splits dataset into (train,test) or (train,validation,test)
     arguments
@@ -102,9 +102,9 @@ def split_dataset(data,labels,validation=True):
     data = np.array(data)
 
     if validation:
-        val_proportion = 0.4
+        val_proportion = val_prop*2
     else:
-        val_proportion = 0.2
+        val_proportion = val_prop
     sss = StratifiedShuffleSplit(n_splits=1, test_size=val_proportion, random_state=0)
     #split train test
     for train_index,test_index  in sss.split(data,labels):
