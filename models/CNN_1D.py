@@ -83,14 +83,15 @@ class Classifier_1DCNN:
         model.compile(loss='categorical_crossentropy', optimizer=optimizer,
             metrics=['accuracy'])
 
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.01)
+        #reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.01)
 
         file_path = self.output_directory+'best_model.hdf5'
 
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
             save_best_only=True)
 
-        self.callbacks = [reduce_lr,model_checkpoint]
+        #self.callbacks = [reduce_lr,model_checkpoint]
+        self.callbacks = [model_checkpoint]
 
         return model
 
