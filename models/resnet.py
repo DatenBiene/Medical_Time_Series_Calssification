@@ -17,42 +17,40 @@ from utils.utils import calculate_metrics
 
 class Classifier_RESNET:
 
-    def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, load_weights=False):
+    def __init__(self, output_directory, input_shape, nb_classes, n_feature_maps=64,kernel_size=5,verbose=False, build=True):
         self.output_directory = output_directory
         if build == True:
-            self.model = self.build_model(input_shape, nb_classes)
+            self.model = self.build_model(input_shape, nb_classes,n_feature_maps,kernel_size)
             if (verbose == True):
                 self.model.summary()
             self.verbose = verbose
-            if load_weights == True:
-                self.model.load_weights(self.output_directory
-                                        .replace('resnet_augment', 'resnet')
-                                        .replace('TSC_itr_augment_x_10', 'TSC_itr_10')
-                                        + '/model_init.hdf5')
-            else:
-                self.model.save_weights(self.output_directory + 'model_init.hdf5')
+            self.model.save_weights(self.output_directory + 'model_init.hdf5')
         return
 
-    def build_model(self, input_shape, nb_classes):
-        n_feature_maps = 64
+    def build_model(self, input_shape, nb_classes,n_feature_maps=64,kernel_size=5):
+
+        if isinstance(n_feature_maps,int):
+            n_feature_maps = 3 * (n_feature_maps,)
+        if isinstance(kernel_size,int):
+            kernel_size = 4 * (kernel_size,)
 
         input_layer = keras.layers.Input(input_shape)
 
         # BLOCK 1
 
-        conv_x = keras.layers.Conv1D(filters=n_feature_maps, kernel_size=8, padding='same')(input_layer)
+        conv_x = keras.layers.Conv1D(filters=n_feature_maps[0], kernel_size=kernel_size[0], padding='same')(input_layer)
         conv_x = keras.layers.BatchNormalization()(conv_x)
         conv_x = keras.layers.Activation('relu')(conv_x)
 
-        conv_y = keras.layers.Conv1D(filters=n_feature_maps, kernel_size=5, padding='same')(conv_x)
+        conv_y = keras.layers.Conv1D(filters=n_feature_maps[0], kernel_size=kernel_size[1], padding='same')(conv_x)
         conv_y = keras.layers.BatchNormalization()(conv_y)
         conv_y = keras.layers.Activation('relu')(conv_y)
 
-        conv_z = keras.layers.Conv1D(filters=n_feature_maps, kernel_size=3, padding='same')(conv_y)
+        conv_z = keras.layers.Conv1D(filters=n_feature_maps[0], kernel_size=kernel_size[2], padding='same')(conv_y)
         conv_z = keras.layers.BatchNormalization()(conv_z)
 
         # expand channels for the sum
-        shortcut_y = keras.layers.Conv1D(filters=n_feature_maps, kernel_size=1, padding='same')(input_layer)
+        shortcut_y = keras.layers.Conv1D(filters=n_feature_maps[0], kernel_size=kernel_size[3], padding='same')(input_layer)
         shortcut_y = keras.layers.BatchNormalization()(shortcut_y)
 
         output_block_1 = keras.layers.add([shortcut_y, conv_z])
@@ -60,19 +58,19 @@ class Classifier_RESNET:
 
         # BLOCK 2
 
-        conv_x = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=8, padding='same')(output_block_1)
+        conv_x = keras.layers.Conv1D(filters=n_feature_maps[1] , kernel_size=kernel_size[0], padding='same')(output_block_1)
         conv_x = keras.layers.BatchNormalization()(conv_x)
         conv_x = keras.layers.Activation('relu')(conv_x)
 
-        conv_y = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=5, padding='same')(conv_x)
+        conv_y = keras.layers.Conv1D(filters=n_feature_maps[1] , kernel_size=kernel_size[1], padding='same')(conv_x)
         conv_y = keras.layers.BatchNormalization()(conv_y)
         conv_y = keras.layers.Activation('relu')(conv_y)
 
-        conv_z = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=3, padding='same')(conv_y)
+        conv_z = keras.layers.Conv1D(filters=n_feature_maps[1] , kernel_size=kernel_size[2], padding='same')(conv_y)
         conv_z = keras.layers.BatchNormalization()(conv_z)
 
         # expand channels for the sum
-        shortcut_y = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=1, padding='same')(output_block_1)
+        shortcut_y = keras.layers.Conv1D(filters=n_feature_maps[1] , kernel_size=kernel_size[3], padding='same')(output_block_1)
         shortcut_y = keras.layers.BatchNormalization()(shortcut_y)
 
         output_block_2 = keras.layers.add([shortcut_y, conv_z])
@@ -80,15 +78,15 @@ class Classifier_RESNET:
 
         # BLOCK 3
 
-        conv_x = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=8, padding='same')(output_block_2)
+        conv_x = keras.layers.Conv1D(filters=n_feature_maps[2] , kernel_size=kernel_size[0], padding='same')(output_block_2)
         conv_x = keras.layers.BatchNormalization()(conv_x)
         conv_x = keras.layers.Activation('relu')(conv_x)
 
-        conv_y = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=5, padding='same')(conv_x)
+        conv_y = keras.layers.Conv1D(filters=n_feature_maps[2] , kernel_size=kernel_size[1], padding='same')(conv_x)
         conv_y = keras.layers.BatchNormalization()(conv_y)
         conv_y = keras.layers.Activation('relu')(conv_y)
 
-        conv_z = keras.layers.Conv1D(filters=n_feature_maps * 2, kernel_size=3, padding='same')(conv_y)
+        conv_z = keras.layers.Conv1D(filters=n_feature_maps[2] , kernel_size=kernel_size[2], padding='same')(conv_y)
         conv_z = keras.layers.BatchNormalization()(conv_z)
 
         # no need to expand channels because they are equal
@@ -108,7 +106,7 @@ class Classifier_RESNET:
         model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, min_lr=0.0001)
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
 
