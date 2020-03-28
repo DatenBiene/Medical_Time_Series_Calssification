@@ -63,12 +63,13 @@ class Classifier_1DCNN:
 
     def build_model(self, nb_classes,n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC):
 
-        if nb_classes == 2:
-            loss = 'binary_crossentropy'
-            n_units_dense = 1
-        else:
-            loss = 'categorical_crossentropy'
-            n_units_dense = nb_classes
+		if nb_classes == 2:
+			loss = 'binary_crossentropy'
+			n_units_dense = 1
+		else:
+			loss = 'categorical_crossentropy'
+			n_units_dense = nb_classes
+
 
         model = Sequential()
 

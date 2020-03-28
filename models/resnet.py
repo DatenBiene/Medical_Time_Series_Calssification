@@ -29,12 +29,12 @@ class Classifier_RESNET:
 
     def build_model(self, input_shape, nb_classes,n_feature_maps=64,kernel_size=5):
 
-		if nb_classes == 2:
-			loss = 'binary_crossentropy'
-			n_units_dense = 1
-		else:
-			loss = 'categorical_crossentropy'
-			n_units_dense = nb_classes
+        if nb_classes==2:
+            loss='binary_crossentropy'
+            n_units_dense = 1
+        else:
+            loss = 'categorical_crossentropy'
+            n_units_dense = nb_classes
 
         if isinstance(n_feature_maps,int):
             n_feature_maps = 3 * (n_feature_maps,)

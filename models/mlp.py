@@ -26,7 +26,7 @@ class Classifier_MLP:
 
 	def build_model(self, input_shape, nb_classes,hidden_layers_size,min_lr):
 
-		if nb_classes == 2:
+		if nb_classes==2:
 			loss = 'binary_crossentropy'
 			n_units_dense = 1
 		else:
