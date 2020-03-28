@@ -63,6 +63,14 @@ class Classifier_1DCNN:
 
     def build_model(self, nb_classes,n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC):
 
+		if nb_classes == 2:
+			loss = 'binary_crossentropy'
+			n_units_dense = 1
+		else:
+			loss = 'categorical_crossentropy'
+			n_units_dense = nb_classes
+
+
         model = Sequential()
 
         add_conv_block_input(model, n_filters[0], kern_size[0], n_stride[0], 'relu', MaxPooling1D(3), 0.1, input_shape)
@@ -75,12 +83,12 @@ class Classifier_1DCNN:
             model.add(BatchNormalization())
             model.add(Activation('relu'))
 
-        model.add(Dense(nb_classes, activation='softmax'))
+        model.add(Dense(n_units_dense, activation='softmax'))
 
         optimizer = SGD(learning_rate=0.05)
         optimizer = tfa.optimizers.SWA(optimizer, start_averaging=0, average_period=3)
 
-        model.compile(loss='categorical_crossentropy', optimizer=optimizer,
+        model.compile(loss=loss, optimizer=optimizer,
             metrics=['accuracy'])
 
         #reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.01)

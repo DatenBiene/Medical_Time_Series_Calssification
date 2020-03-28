@@ -29,6 +29,13 @@ class Classifier_RESNET:
 
     def build_model(self, input_shape, nb_classes,n_feature_maps=64,kernel_size=5):
 
+		if nb_classes == 2:
+			loss = 'binary_crossentropy'
+			n_units_dense = 1
+		else:
+			loss = 'categorical_crossentropy'
+			n_units_dense = nb_classes
+
         if isinstance(n_feature_maps,int):
             n_feature_maps = 3 * (n_feature_maps,)
         if isinstance(kernel_size,int):
@@ -99,11 +106,11 @@ class Classifier_RESNET:
 
         gap_layer = keras.layers.GlobalAveragePooling1D()(output_block_3)
 
-        output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
+        output_layer = keras.layers.Dense(n_units_dense, activation='softmax')(gap_layer)
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
-        model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adam(),
+        model.compile(loss=loss, optimizer=keras.optimizers.Adam(),
                       metrics=['accuracy'])
 
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=0.0001)

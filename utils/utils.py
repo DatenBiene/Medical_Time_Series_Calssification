@@ -129,7 +129,7 @@ def split_dataset(data,labels,validation=True , val_prop = 0.2):
         return xtrain,ytrain,xtest,ytest,y_test_true
 
 
-def visualize_transplant(X,y):
+def visualize_transplant(X,y,cols):
     fig = plt.figure(figsize=(14,15))
     series0 = X[y==0][0]
     series1 = X[y==1][0]
@@ -143,8 +143,8 @@ def visualize_transplant(X,y):
 
         ax0.set_ylabel(cols[i],fontsize=16)
         if i == 0:
-            ax0.set_title('Example of label 0',fonsize=16)
-            ax1.set_title('Example of label 1',fonsize=16)
+            ax0.set_title('Example of label 0',fontsize=16)
+            ax1.set_title('Example of label 1',fontsize=16)
     plt.tight_layout()
     plt.show()
 

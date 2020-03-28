@@ -21,10 +21,17 @@ class Classifier_MLP:
 				self.model.summary()
 			self.verbose = verbose
 			self.model.save_weights(self.output_directory + 'model_init.hdf5')
-   
+
 		return
 
 	def build_model(self, input_shape, nb_classes,hidden_layers_size,min_lr):
+
+		if nb_classes == 2:
+			loss = 'binary_crossentropy'
+			n_units_dense = 1
+		else:
+			loss = 'categorical_crossentropy'
+			n_units_dense = nb_classes
 
 		n_layers = len(hidden_layers_size)
 
@@ -39,9 +46,10 @@ class Classifier_MLP:
 			model.add(keras.layers.Dense(hidden_layers_size[i], activation='relu'))
 
 		model.add(keras.layers.Dropout(0.3))
-		model.add(keras.layers.Dense(nb_classes, activation='softmax'))
+		model.add(keras.layers.Dense(n_units_dense, activation='softmax'))
 
-		model.compile(loss='categorical_crossentropy', optimizer=keras.optimizers.Adadelta(),
+
+		model.compile(loss=loss, optimizer=keras.optimizers.Adadelta(),
 			metrics=['accuracy'])
 
 		reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=10, min_lr=min_lr)
