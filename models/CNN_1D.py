@@ -21,25 +21,25 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-from utils import plot_epochs_metric
-from utils import calculate_metrics
+from utils.utils import plot_epochs_metric
+from utils.utils import calculate_metrics
 
 
 def add_conv_block_input(model, n_filters, kern_size, n_stride, fc_act, pooling, coeff_dropout, input_shape):
-    model.add(Conv1D(filters = n_filters, kernel_size = kern_size, 
+    model.add(Conv1D(filters = n_filters, kernel_size = kern_size,
                      strides = n_stride, padding='same', input_shape=input_shape))
     model.add(BatchNormalization())
     model.add(Activation(fc_act))
     model.add(Dropout(coeff_dropout))
-    model.add(Conv1D(filters = n_filters, kernel_size = kern_size, 
+    model.add(Conv1D(filters = n_filters, kernel_size = kern_size,
                      strides = n_stride, padding='same'))
     model.add(BatchNormalization())
     model.add(Activation(fc_act))
     model.add(Dropout(coeff_dropout))
     model.add(pooling)
-    
+
 def add_conv_block(model, n_filters, kern_size, n_stride, fc_act, coeff_dropout, pooling):
-    model.add(Conv1D(filters = n_filters, kernel_size = kern_size, 
+    model.add(Conv1D(filters = n_filters, kernel_size = kern_size,
                      strides = n_stride, padding='same'))
     model.add(BatchNormalization())
     model.add(Activation(fc_act))
@@ -52,16 +52,16 @@ def add_conv_block(model, n_filters, kern_size, n_stride, fc_act, coeff_dropout,
 
 class Classifier_1DCNN:
 
-    def __init__(self, output_directory, n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC,verbose=False,build=True):
+    def __init__(self, output_directory, nb_classes,n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC,verbose=False,build=True):
         self.output_directory = output_directory
         if build == True:
-            self.model = self.build_model(n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC)
+            self.model = self.build_model(nb_classes,n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC)
             if(verbose==True):
                 self.model.summary()
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
 
-    def build_model(self, n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC):
+    def build_model(self, nb_classes,n_conv_block, n_filters, kern_size, n_stride, input_shape, add_FC, n_unit_FC):
 
         model = Sequential()
 
@@ -74,9 +74,9 @@ class Classifier_1DCNN:
             model.add(Dense(n_unit_FC))
             model.add(BatchNormalization())
             model.add(Activation('relu'))
-    
-        model.add(Dense(n_classes, activation='softmax'))
-        
+
+        model.add(Dense(nb_classes, activation='softmax'))
+
         optimizer = SGD(learning_rate=0.05)
         optimizer = tfa.optimizers.SWA(optimizer, start_averaging=0, average_period=3)
 
@@ -103,7 +103,7 @@ class Classifier_1DCNN:
 
         start_time = time.time()
 
-        hist = self.model.fit(x_train, y_train, batch_size=mini_batch_size, epochs=nb_epochs,
+        hist = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=nb_epochs,
             verbose=self.verbose, validation_data=(x_val,y_val), callbacks=self.callbacks)
 
         duration = time.time() - start_time
@@ -137,7 +137,3 @@ class Classifier_1DCNN:
 
 
 # In[ ]:
-
-
-
-
