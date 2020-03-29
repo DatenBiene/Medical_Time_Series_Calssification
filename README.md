@@ -7,7 +7,7 @@ Deep Learning for Medical Time Series Classification applied to ECG examination 
 This repository contains the code and materials used to obtain the results of our study on medical time series classification.
 This project was the final evaluation of the course of Deep learning for medical imaging taught by O.COLLIOT and M.VAKALOPOULOU for the MVA Master, ENS Paris Saclay.
 
-Please  read the [report](Report.pdf) explaining the implementation and the choice of the approaches.
+Please  read the [report](Report.pdf) explaining the implementation and the approaches choices.
  
 ## Content
 - A [notebook](KNN_Baseline.ipynb) implementing the KNN with DWT for each of the three datasets 
