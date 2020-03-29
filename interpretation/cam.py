@@ -71,6 +71,6 @@ def display_conv_activations_transplant(model,sig,cols):
         fig.colorbar(line, ax=ax)
         ax.set_xlim(t.min(), t.max())
         ax.set_ylim(signal.min(),signal.max())
-        ax.set_title(cols[i],fontsize=13)
+        ax.set_title(cols[i-1],fontsize=13)
 
     plt.tight_layout()
